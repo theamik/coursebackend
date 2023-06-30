@@ -2,6 +2,7 @@ import express from "express";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 
+
 config({
     path: './config/config.env',
 })

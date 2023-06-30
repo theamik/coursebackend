@@ -12,6 +12,9 @@ cloudinary.v2.config({
     api_key:process.env.CLOUDINARY_CLIENT_API,
     api_secret:process.env.CLOUDINARY_CLIENT_SECRET,
 })
+app.get("/",(req,res)=>{
+    res.send("<h1>Working Fine</h1>");
+});
 
 export const instance = new Razorpay({
     key_id:process.env.RAZORPAY_API_KEY,
