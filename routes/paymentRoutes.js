@@ -4,7 +4,7 @@ import { isAuthenticated } from "../middlewares/auth.js";
 const router = express.Router();
 
 router.route("/subscribe").get(isAuthenticated, buySubscription);
-router.route("/paymentverification").get(isAuthenticated, paymentVerification);
+router.route("/paymentverification").post(isAuthenticated, paymentVerification);
 router.route("/getrazorpaykey").get(getRazorpayKey);
 router.route("/subscribe/cancel").delete(isAuthenticated, cancelSubscription);
 
