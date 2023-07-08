@@ -83,7 +83,7 @@ export const cancelSubscription = catchAsyncError(async (req, res, next) => {
         await instance.payments.refund(payment.razorpay_payment_id);
         refund = true;
     }
-    await Payment.deleteOne(payment);
+    await Payment.deleteOne(payment._id);
 
     user.subscription.id = undefined;
     user.subscription.status = undefined;
