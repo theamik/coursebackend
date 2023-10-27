@@ -1,5 +1,5 @@
 import express from "express";
-import { addToPlaylist, changePassword, deleteMyProfile, deleteUser, forgetPassword, getAllUsers, getMyProfile, login, logout, register, removeFromPlaylist, resetPassword, updateProfile, updateProfilePicture, updateUserRole } from "../controllers/userController.js";
+import {  changePassword, deleteMyProfile, deleteUser, forgetPassword, getAllUsers, getMyProfile, login, logout, register, resetPassword, updateProfile, updateProfilePicture, updateUserRole } from "../controllers/userController.js";
 import { authorizedAdmin, isAuthenticated } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 
@@ -24,10 +24,6 @@ router.route('/update-profile-picture').put(isAuthenticated, singleUpload, updat
 router.route('/forget-password').post(forgetPassword);
 
 router.route('/resetpassword/:token').put(resetPassword);
-
-router.route('/addtopalylist').post(isAuthenticated, addToPlaylist);
-
-router.route('/removefrompalylist').delete(isAuthenticated, removeFromPlaylist);
 
 //Admin Routes
 

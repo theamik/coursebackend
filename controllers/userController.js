@@ -1,14 +1,11 @@
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { User } from "../models/User.js";
-import { Course } from "../models/Course.js";
 import { sendToken } from "../utils/sendToken.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import crypto from "crypto";
 import cloudinary from "cloudinary";
 import { getDataUri } from "../utils/dataUri.js";
-import { Stats } from "../models/Stats.js"
-
 
 export const register = catchAsyncError(async (req, res, next) => {
     const { name, email, password } = req.body;
@@ -47,6 +44,8 @@ export const login = catchAsyncError(async (req, res, next) => {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return next(new ErrorHandler("Email or password are incorrect", 401));
     //const file = req.file;
+    const admin = await user.role === "admin"
+    if (!admin) return next(new ErrorHandler("You have no access to get resource", 401));
 
     sendToken(res, user, `Welcome back ${user.name}`, 201);
 
@@ -55,9 +54,9 @@ export const login = catchAsyncError(async (req, res, next) => {
 export const logout = catchAsyncError(async (req, res, next) => {
     res.status(200).cookie("token", null, {
         expires: new Date(Date.now()),
-        httpOnly:true,
-        secure:true,
-        sameSite:"none",
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
     }).json({
         success: true,
         message: "Successfully Logout !",
@@ -185,46 +184,6 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
     });
 });
 
-export const addToPlaylist = catchAsyncError(async (req, res, next,) => {
-    const user = await User.findById(req.user._id);
-    const course = await Course.findById(req.body.id);
-
-    if (!course) return next(new ErrorHandler("Course are not found", 404));
-
-    const itemExit = user.playlist.find((item) => {
-        if (item.course.toString() === course._id.toString()) return true;
-    });
-    if (itemExit) return next(new ErrorHandler("Item already exist", 409));
-
-    user.playlist.push({
-        course: course._id,
-        poster: course.poster.url,
-    });
-    await user.save();
-    res.status(200).json({
-        success: true,
-        message: "Course added to playlist !",
-    });
-});
-
-export const removeFromPlaylist = catchAsyncError(async (req, res, next,) => {
-    const user = await User.findById(req.user._id);
-    const course = await Course.findById(req.query.id);
-
-    if (!course) return next(new ErrorHandler("Course are not found", 404));
-
-    const newPlayist = user.playlist.filter((item) => {
-        if (item.course.toString() !== course._id.toString()) return item;
-    });
-
-    user.playlist = newPlayist;
-    await user.save();
-    res.status(200).json({
-        success: true,
-        message: "Course removed from playlist!",
-    });
-});
-
 //Admin Controller
 
 export const getAllUsers = catchAsyncError(async (req, res, next,) => {
@@ -287,15 +246,3 @@ export const deleteMyProfile = catchAsyncError(async (req, res, next,) => {
         message: "User deleted successfully",
     });
 });
-
-User.watch().on("change", async () => {
-    const stats = await Stats.find({}).sort({ createdAt: "desc" }).limit(1);
-
-    const subscription = await User.find({ "subscription.status": "active" });
-
-    stats[0].users = await User.countDocuments();
-    stats[0].subscription = subscription.length;
-    stats[0].createdAt = new Date(Date.now());
-
-    await stats[0].save();
-})

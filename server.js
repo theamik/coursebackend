@@ -26,10 +26,10 @@ export const instance = new Razorpay({
     }
   });
 
-//   const temp = async()=>{
-//     await Stats.create({});
-//   }
-//   temp();
+  // const temp = async()=>{
+  //   await Stats.create({});
+  // }
+  // temp();
 app.listen(process.env.PORT,()=>{
     console.log(`Server is running on port: ${process.env.PORT}`);
 });

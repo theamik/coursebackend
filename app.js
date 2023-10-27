@@ -2,6 +2,7 @@ import express from "express";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import bodyParser from 'body-parser';
 
 
 config({
@@ -15,19 +16,23 @@ app.use(express.urlencoded({
     extended: true,
 }));
 app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:false}));
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: 'http://localhost:3000',
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"]
 }))
 
-import course from './routes/courseRoutes.js';
+import party from './routes/partyRoutes.js';
+import transaction from './routes/transactionRoutes.js';
 import user from './routes/userRoutes.js';
 import payment from './routes/paymentRoutes.js';
 import other from './routes/otherRoutes.js';
 import { ErrorMiddleware } from "./middlewares/Error.js";
 
-app.use("/api/v1/", course);
+app.use("/api/v1/", party);
+app.use("/api/v1/", transaction);
 app.use("/api/v1/", user);
 app.use("/api/v1/", payment);
 app.use("/api/v1/", other);
